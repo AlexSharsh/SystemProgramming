@@ -3,92 +3,95 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Unit : MonoBehaviour
+namespace Homework1
 {
-    int health;
-    private bool isHealthCoroutineActive;
-    private int healthCoroutineState;
-    private Coroutine healthCoroutineHandle;
-
-    public void Awake()
+    public class Unit : MonoBehaviour
     {
-        healthCoroutineHandle = null;
-        healthCoroutineState = 0;
-        isHealthCoroutineActive = false;
-        SetHealth(51);
-    }
+        int health;
+        private bool isHealthCoroutineActive;
+        private int healthCoroutineState;
+        private Coroutine healthCoroutineHandle;
 
-    public void FixedUpdate()
-    {
-        ReceiveHealing();
-    }
-
-
-    private void OnDestroy()
-    {
-        if(healthCoroutineHandle != null)
+        public void Awake()
         {
-            StopCoroutine(healthCoroutineHandle);
+            healthCoroutineHandle = null;
+            healthCoroutineState = 0;
+            isHealthCoroutineActive = false;
+            SetHealth(51);
         }
-    }
 
-    public void SetHealth(int points)
-    {
-        health = points;
-        if(health > 100)
-            health = 100;
-
-        Debug.Log($"Start Healths: {health}");
-    }
-
-    public void AddHealth(int points)
-    {
-        health += points;
-        if (health > 100)
-            health = 100;
-
-        Debug.Log($"Add Healths: {health}");
-    }
-
-    public int GetHealth()
-    {
-        return health;
-    }
-
-
-    public void ReceiveHealing()
-    {
-        if (!isHealthCoroutineActive)
+        public void FixedUpdate()
         {
-            isHealthCoroutineActive = true;
-            healthCoroutineHandle = StartCoroutine(RestoreHealth());
+            ReceiveHealing();
         }
-    }
 
-    IEnumerator RestoreHealth()
-    {
-        if(GetHealth() < 100)
+
+        private void OnDestroy()
         {
-            if (healthCoroutineState < 6)
+            if (healthCoroutineHandle != null)
             {
-                healthCoroutineState++;
+                StopCoroutine(healthCoroutineHandle);
+            }
+        }
 
-                AddHealth(5);
-                yield return new WaitForSeconds(0.5f);
+        public void SetHealth(int points)
+        {
+            health = points;
+            if (health > 100)
+                health = 100;
+
+            Debug.Log($"Start Healths: {health}");
+        }
+
+        public void AddHealth(int points)
+        {
+            health += points;
+            if (health > 100)
+                health = 100;
+
+            Debug.Log($"Add Healths: {health}");
+        }
+
+        public int GetHealth()
+        {
+            return health;
+        }
+
+
+        public void ReceiveHealing()
+        {
+            if (!isHealthCoroutineActive)
+            {
+                isHealthCoroutineActive = true;
+                healthCoroutineHandle = StartCoroutine(RestoreHealth());
+            }
+        }
+
+        IEnumerator RestoreHealth()
+        {
+            if (GetHealth() < 100)
+            {
+                if (healthCoroutineState < 6)
+                {
+                    healthCoroutineState++;
+
+                    AddHealth(5);
+                    yield return new WaitForSeconds(0.5f);
+                }
+                else
+                {
+                    AddHealth(5);
+                    yield return new WaitForSeconds(0.5f);
+                }
             }
             else
             {
-                AddHealth(5);
+                healthCoroutineState = 0;
                 yield return new WaitForSeconds(0.5f);
             }
-        }
-        else
-        {
-            healthCoroutineState = 0;
-            yield return new WaitForSeconds(0.5f);
+
+            isHealthCoroutineActive = false;
         }
 
-        isHealthCoroutineActive = false;
     }
-
 }
